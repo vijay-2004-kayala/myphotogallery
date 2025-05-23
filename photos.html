@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>3D Photo Gallery</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+    body {
+      margin: 0;
+      padding: 0;
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+      background: #121212;
+      color: #fff;
+    }
+    .gallery-section, .saved-section {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+    }
+    .gallery-section {
+      border-right: 2px solid #444;
+    }
+    h2 {
+      margin-bottom: 15px;
+      color: #00ffc8;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 20px;
+    }
+    .photo {
+      position: relative;
+      perspective: 1000px;
+    }
+    .photo img {
+      width: 100%;
+      border-radius: 12px;
+      transition: transform 0.4s ease, box-shadow 0.4s ease;
+      transform-style: preserve-3d;
+    }
+    .photo img:hover {
+      transform: rotateY(15deg) scale(1.05);
+      box-shadow: 0 10px 20px rgba(0,255,200,0.5);
+    }
+    .btn-group {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      display: flex;
+      gap: 5px;
+    }
+    .save-btn, .delete-btn {
+      background: rgba(0, 255, 200, 0.8);
+      border: none;
+      padding: 5px 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 12px;
+    }
+    .delete-btn {
+      background: rgba(255, 80, 80, 0.85); /* Red tint */
+    }
+    .popup {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #00ffc8;
+      color: #000;
+      padding: 12px 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px #00ffc8;
+      opacity: 0;
+      transform: translateY(-20px);
+      transition: all 0.5s ease;
+      z-index: 1000;
+    }
+    .popup.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="gallery-section">
+    <h2>My Photo Gallery</h2>
+    <div class="grid" id="gallery"></div>
+  </div>
+
+  <div class="saved-section">
+    <h2>Saved Photos</h2>
+    <div class="grid" id="saved-gallery"></div>
+  </div>
+
+  <div class="popup" id="popup">Photo Saved!</div>
+
+  <script>
+    const photos = [
+      'https://picsum.photos/200?random=1',
+      'https://picsum.photos/200?random=2',
+      'https://picsum.photos/200?random=3',
+      'https://picsum.photos/200?random=4',
+      'https://picsum.photos/200?random=5',
+      'https://picsum.photos/200?random=6',
+      'https://picsum.photos/200?random=7',
+      'https://picsum.photos/200?random=8',
+    ];
+
+    const gallery = document.getElementById('gallery');
+    const savedGallery = document.getElementById('saved-gallery');
+    const popup = document.getElementById('popup');
+
+    function createPhotoCard(src, isSaved = false) {
+      const photoDiv = document.createElement('div');
+      photoDiv.className = 'photo';
+
+      const img = document.createElement('img');
+      img.src = src;
+
+      const btnGroup = document.createElement('div');
+      btnGroup.className = 'btn-group';
+
+      if (!isSaved) {
+        const saveBtn = document.createElement('button');
+        saveBtn.className = 'save-btn';
+        saveBtn.textContent = 'Save';
+        saveBtn.addEventListener('click', () => savePhoto(src));
+        btnGroup.appendChild(saveBtn);
+      }
+
+      const deleteBtn = document.createElement('button');
+      deleteBtn.className = 'delete-btn';
+      deleteBtn.textContent = 'Delete';
+      deleteBtn.addEventListener('click', () => {
+        photoDiv.remove();
+        showPopup('Photo Deleted!', true);
+      });
+      btnGroup.appendChild(deleteBtn);
+
+      photoDiv.appendChild(img);
+      photoDiv.appendChild(btnGroup);
+
+      return photoDiv;
+    }
+
+    function savePhoto(src) {
+      const savedCard = createPhotoCard(src, true);
+      savedGallery.appendChild(savedCard);
+      showPopup('Photo Saved!');
+    }
+
+    function showPopup(message, isDelete = false) {
+      popup.textContent = message;
+      popup.style.background = isDelete ? '#ff5050' : '#00ffc8';
+      popup.style.color = '#000';
+      popup.classList.add('show');
+      setTimeout(() => {
+        popup.classList.remove('show');
+      }, 1500);
+    }
+
+    // Populate the main gallery
+    photos.forEach(src => {
+      const card = createPhotoCard(src);
+      gallery.appendChild(card);
+    });
+  </script>
+</body>
+</html>
